@@ -12,6 +12,12 @@ export class BasePage {
         await locator.click();
     }
 
+    async safeClick(locator: Locator) {
+        await expect(locator).toBeVisible();
+        await expect(locator).toBeEnabled();
+          await locator.click();
+    }
+
     async fill(locator: Locator, text: string) {
         await locator.fill(text);
     }
