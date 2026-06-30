@@ -1,49 +1,43 @@
-import { test } from '@playwright/test';
+import { test } from '../src/fixtures/fixtures';
 
-import { LandingPage } from '../pages/LandingPage';
-import { LoginPage } from '../pages/LoginPage';
-import { HomePage } from '../pages/HomePage';
-import { AdminPanelPage } from '../pages/AdminPanelPage';
-import { InvoicePage } from '../pages/InvoicePage';
+test('Create Invoice to Yourself', async ({
+    auth,
+    homePage,
+    adminPanelPage,
+    invoicePage,
+    users,
+    invoiceData
+}) => {
 
-import { users } from '../data/users';
-import { invoiceData } from '../data/invoiceData';
-
-test('Create Invoice to Yourself', async ({ page }) => {
-
-    const landing = new LandingPage(page);
-    const login = new LoginPage(page);
-    const home = new HomePage(page);
-    const admin = new AdminPanelPage(page);
-    const invoice = new InvoicePage(page);
-
-    // Open application
-    await landing.open();
-
-    // Accept alert
-    await landing.acceptAlert();
-
-    // Login
-    await landing.clickLogin();
-
-    await login.login(
+    // LOGIN (FLOW LAYER)
+    await auth.loginAsAdmin(
         users.admin.email,
         users.admin.password
     );
 
-    // Verify home page
-    await home.verifyHomePage();
+    // VERIFY HOME
+    await homePage.expectLoaded();
 
-    // Navigate to Admin Panel
-    await home.navigateToAdminPanel();
+    // NAVIGATION
+    await homePage.navigateToAdminPanel();
+    await adminPanelPage.openInvoices();
 
-    // Open Invoices
-    await admin.clickInvoices();
+    // CREATE INVOICE
+    await invoicePage.openCreateInvoice();
 
-    // Create Invoice
-    await invoice.createInvoiceToYourself(invoiceData);
+    await invoicePage.fillClient(
+        invoiceData.clientName,
+        invoiceData.address
+    );
 
-    // Validate invoice created
-    await invoice.verifyInvoiceCreated();
+    await invoicePage.clickAnywhere();
 
+    for (const course of invoiceData.courses) {
+        await invoicePage.addCourse(course.value);
+    }
+
+    await invoicePage.submit();
+
+    // ASSERTION
+    await invoicePage.expectInvoiceCreated();
 });
