@@ -1,6 +1,6 @@
 export const invoiceData = {
-    clientName: 'Your Name Pty Ltd',
-    address: `123 Fake Street
+    clientName: 'Omphe L Pty Ltd',
+    address: `13 Morula Street
 Johannesburg
 South Africa
 2000`,
